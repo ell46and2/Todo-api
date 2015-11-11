@@ -1,5 +1,6 @@
 var express = require('express');
 var bodyParser = require('body-parser');
+var _ = require('underscore');
 
 var app = express();
 var PORT = process.env.PORT || 3000;
@@ -20,13 +21,18 @@ app.get('/todos', function(req, res) {
 // GET /todos/:id
 app.get('/todos/:id', function(req, res) {
 	var todoId = parseInt(req.params.id, 10);
-	var matchedTodo;
-	// Iterate over todos array. Find the match.
-	for(var i =0; i<todos.length; i++) {	
-		if(todos[i].id === todoId) {
-			matchedTodo = todos[i];
-		}
-	}
+	
+	// uses _.findWhere function from underscores. It returns the first matching value.
+	// _.findWhere(list, properties to match)
+	var matchedTodo = _.findWhere(todos, {id: todoId});
+	
+	// var matchedTodo;
+	// // Iterate over todos array. Find the match.
+	// for(var i =0; i<todos.length; i++) {	
+	// 	if(todos[i].id === todoId) {
+	// 		matchedTodo = todos[i];
+	// 	}
+	// }
 	if(matchedTodo) {
 		res.json(matchedTodo);
 	} else {
@@ -36,7 +42,15 @@ app.get('/todos/:id', function(req, res) {
 
 // POST /todos
 app.post('/todos', function(req, res) {
-	var body = req.body;
+	// uses _.pick function from underscores. Returns a copy of the object, filtered to only have the selected values.
+	var body = _.pick(req.body, 'description', 'completed');
+	// if completed is not a boolean OR description isn't a string OR description is just spaces.
+	if(!_.isBoolean(body.completed) || !_.isString(body.description) || body.description.trim().length === 0) {
+		return res.status(400).send();
+	}
+	
+	// set body.description to be trimmed value
+	body.description = body.description.trim();
 	
 	// add id field
 	body.id = todoNextId;
