@@ -62,6 +62,25 @@ app.post('/todos', function(req, res) {
 	res.json(body);
 });
 
+// DELETE /todos/:id
+app.delete('/todos/:id', function(req, res) {
+	var todoId = parseInt(req.params.id, 10);
+	
+	// uses _.findWhere function from underscores. It returns the first matching value.
+	// _.findWhere(list, properties to match)
+	var matchedTodo = _.findWhere(todos, {id: todoId});
+	
+	if(!matchedTodo) {
+		res.status(404).json({"error": "No todo found with that id"});
+	} else {
+		//Returns a copy of the array with all instances of the values removed.
+		todos = _.without(todos, matchedTodo);
+		res.json(matchedTodo);
+	}
+	
+});
+	
+
 app.listen(PORT, function() {
 	console.log(`Express listening on port ${PORT}!`);
 });
