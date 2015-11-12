@@ -40,10 +40,23 @@ app.get('/todos', function(req, res) {
 // GET /todos/:id
 app.get('/todos/:id', function(req, res) {
 	var todoId = parseInt(req.params.id, 10);
+	//var matchedTodo;
 	
 	// uses _.findWhere function from underscores. It returns the first matching value.
 	// _.findWhere(list, properties to match)
-	var matchedTodo = _.findWhere(todos, {id: todoId});
+	//var matchedTodo = _.findWhere(todos, {id: todoId});
+	
+	db.todo.findById(todoId).then(function(todo) {
+		if(todo) {
+			res.json(todo);
+		} else {
+			res.status(404).send();
+		}
+	}, function(e) {
+		res.status(500).send();
+	});
+	
+	
 	
 	// var matchedTodo;
 	// // Iterate over todos array. Find the match.
@@ -52,11 +65,11 @@ app.get('/todos/:id', function(req, res) {
 	// 		matchedTodo = todos[i];
 	// 	}
 	// }
-	if(matchedTodo) {
+	/*if(matchedTodo) {
 		res.json(matchedTodo);
 	} else {
 		res.status(404).send();	
-	}
+	}*/
 });
 
 // POST /todos
